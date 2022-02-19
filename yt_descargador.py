@@ -1,4 +1,3 @@
-from cgitb import text
 from tkinter import*
 from tkinter import ttk
 from pytube import YouTube
@@ -17,7 +16,7 @@ link_video = StringVar()
 texto_etiqueta = "Inserta el link del video:"
 etiqueta_link = Label(frame, text= texto_etiqueta, font=("Arial bold", 20)).place(x=270, y=30)
 entrada_link = Entry(frame, width=80, textvariable = link_video).place(x=100, y=90)
-boton_descargar = Button(frame, width=20, text = "Descargar", command=lambda:descargar())
+
 
 def buscar(link_video):
     try:
@@ -29,7 +28,10 @@ boton_buscar = Button(frame, text="Buscar", width=10, font=("Arial bold", 15), c
 
 
 def buscar_video(link_video):
-    url = YouTube(str(link_video.get()))
+
+    global url 
+    url = YouTube(str(link_video.get()), on_progress_callback=progreso)
+    video = url.streams.get_highest_resolution()
     titulo = url.title
     url_min = url.thumbnail_url
     u = urlopen(url_min)
@@ -41,23 +43,23 @@ def buscar_video(link_video):
     label_miniatura = Label(frame, image = img)
     label_miniatura.image = img
     label_titulo = Label(frame, text=titulo, font=("Arial bold", 10))
-    #boton_descargar = Button(frame, width=20, text = "Descargar", command=lambda:descargar)
+    global b_progreso
+    b_progreso = ttk.Progressbar(frame, orient="horizontal", length=400)
+    boton_descargar = Button(frame, width=20, text = "Descargar", command=lambda:descargar(video))
     label_titulo.place(x=350, y=140)
     label_miniatura.place_configure(width=210, height=118, x= 100, y=140)
+    
     boton_descargar.place(x=350, y=210)
     
     
-def descargar():
-    b_progreso = ttk.Progressbar(frame, orient="horizontal", length=400)
-    b_progreso.place(x=200, y=300)
-    progreso(b_progreso)
+def descargar(video):
+    #b_progreso.place(x=200, y=300)
+    video.download()
+    
 
-def progreso(bp):
-    bp.step(20)
-
-
-
-
+def progreso(stream=None, chunk=None, file_handle=None, bytes_remaining=None):
+    pass
+    #b_progreso.step(int(100 - (100*(bytes_remaining))))
 
 
 
