@@ -1,10 +1,12 @@
 from tkinter import*
 from tkinter import ttk
+from tkinter import messagebox
 from pytube import YouTube
 from PIL import Image, ImageTk
 from urllib.request import urlopen
 from io import BytesIO
 import threading
+import datetime
 
 root = Tk()
 root.title("Descargardor de Videos YT")
@@ -21,6 +23,8 @@ entrada_link = Entry(frame, width=80, textvariable = link_video).place(x=100, y=
 #global titulo
 #titulo = ""
 label_titulo = Label(frame, text="", font=("Arial bold", 10))
+label_duracion = Label(frame, text="", font=("Arial bold", 10))
+#label_descripcion = Label(frame, text="", font=("Arial bold", 10), width=100)
 #label_miniatura = Label(frame, image = None)
 
 
@@ -30,7 +34,8 @@ def buscar(link_video):
         #buscar_video(link_video)
         hilo1.start()
     except:
-        error_label= Label(frame, text= "Ha ocurrido un error", font=("Arial bold", 20)).place(x=350, y=200)
+        error_label= Label(frame, text= "Ha ocurrido un error", font=("Arial bold", 20))
+        error_label.place(x=350, y=200)
 
 boton_buscar = Button(frame, text="Buscar", width=10, font=("Arial bold", 15), fg="white", bg="#c4302b", command=lambda:buscar(link_video)).place(x=600, y=80)
 
@@ -41,6 +46,8 @@ def buscar_video(link_video):
     url = YouTube(str(link_video.get()), on_progress_callback=progreso)
     video = url.streams.get_highest_resolution()
     titulo = url.title
+    duracion = str(datetime.timedelta(seconds=url.length))
+    #descripcion = url.description
     url_min = url.thumbnail_url
     u = urlopen(url_min)
     raw_data = u.read()
@@ -50,12 +57,16 @@ def buscar_video(link_video):
     img = ImageTk.PhotoImage(im)
     label_miniatura = Label(frame, image = img)
     label_miniatura.image = img
-    label_titulo['text']=titulo
+    label_titulo['text'] = titulo
+    label_duracion['text'] = "Duración: " + duracion
+    #label_descripcion['text'] = descripcion
     #label_titulo = Label(frame, text=titulo, font=("Arial bold", 10))
     global b_progreso
     b_progreso = ttk.Progressbar(frame, orient="horizontal", length=400)
     boton_descargar = Button(frame, width=20, text = "Descargar", fg="white", bg="#8DB600", command=lambda:descargar(video))
     label_titulo.place(x=350, y=140)
+    label_duracion.place(x=350, y=160)
+    #label_descripcion.place(x=350, y=180)
     label_miniatura.place_configure(width=210, height=118, x= 100, y=140)
     
     boton_descargar.place(x=350, y=210)
@@ -68,6 +79,7 @@ def descargar(video):
 
 def descargar_video(video):
     video.download()
+    messagebox.showinfo("Descarga completa", "¡Descarga completada con éxito!")
  
 
 def progreso(stream=None, chunk=None, file_handle=None, bytes_remaining=None):
