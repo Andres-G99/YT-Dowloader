@@ -26,16 +26,27 @@ label_titulo = Label(frame, text="", font=("Arial bold", 10))
 label_duracion = Label(frame, text="", font=("Arial bold", 10))
 #label_descripcion = Label(frame, text="", font=("Arial bold", 10), width=100)
 #label_miniatura = Label(frame, image = None)
-
+error_label= Label(frame, text= "", font=("Arial bold", 20))
 
 def buscar(link_video):
     try:
+        error_label['text'] = ""
         hilo1 = threading.Thread(target=buscar_video(link_video),args=link_video)
         #buscar_video(link_video)
         hilo1.start()
     except:
-        error_label= Label(frame, text= "Ha ocurrido un error", font=("Arial bold", 20))
-        error_label.place(x=350, y=200)
+        error_label['text'] = "Ha ocurrido un error"
+        error_label.place(x=350, y=180)
+        #error_img = PhotoImage(file="images/error_img.png")
+        #label_miniatura_err = Label(frame, image = error_img)
+        #label_miniatura_err.place(x= 100, y=140)
+        err_img = Image.open("images/error_img.png")
+        err_img = err_img.resize((210,118), Image.ANTIALIAS)
+        photo_err = ImageTk.PhotoImage(image=err_img)
+        label_miniatura_err = Label(frame, image = photo_err)
+        label_miniatura_err.image = photo_err
+        label_miniatura_err.place_configure(width=210, height=118, x= 100, y=140)
+        
 
 boton_buscar = Button(frame, text="Buscar", width=10, font=("Arial bold", 15), fg="white", bg="#c4302b", command=lambda:buscar(link_video)).place(x=600, y=80)
 
